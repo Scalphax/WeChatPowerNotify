@@ -153,6 +153,7 @@ def command():
         elif cmd == "ping":
             processed_data['content'] = f"""<h1>pong</h1><br/>
                                             <p>发送时间{time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())}</p>"""
+            req.post(api_url,json=processed_data,verify=False)
             return '',200
         else:
             wrong_code()
