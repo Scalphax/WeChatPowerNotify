@@ -2,6 +2,7 @@ from flask import Flask,request,jsonify,render_template
 from config import token,get
 import requests as req
 import sqlite3 as sql
+import time,threading
 
 api_url = "https://wxpusher.zjiecode.com/api/send/message"
 app = Flask(__name__)
@@ -33,7 +34,35 @@ def data_query(uid):
                                 预警值: {alarm_value}{alarm_type(alarm)}<br/>
                                 数据更新时间: {timestamp}"""
     req.post(api_url,json=processed_data,verify=False)
-    
+
+def refresh_data():
+    conn = open_sql()
+    rows = conn.execute('SELECT uid, roomid, alarm FROM usr').fetchall()
+    for row in rows:
+        raw_roomid = row[1]
+        uid = row[0]
+        roomid = raw_roomid[2:]
+        up_dict = {
+            "meterId":f"0311.{roomid}.1",
+            "factorycode":"E035"
+        }
+        data = get("queryReserve",up_dict)
+        conn.execute("""UPDATE usr  
+                        SET money = ?, used = ?, remain = ?, timestamp = CURRENT_TIMESTAMP
+                        WHERE uid = ?
+                    """, (data['meterOverdue'],data['ZVlaue'],data['remainPower'],uid))
+        alarm_type,alarm_value = row[2].split(':')
+        at = lambda type: data['meterOverdue'] if type == "m" else data['remainPower']
+        if float(alarm_value) >= float(at(alarm_type)):
+            processed_data['uids'] = [uid,]
+            processed_data['content'] = f"""<h1>低于预警线警告</h1><br/>
+                            <p>您当前电费/电量低于预警线</p><br/>
+                            详情请见下一条消息"""
+            req.post(api_url,json=processed_data,verify=False)
+            data_query(uid)
+    conn.commit()
+    time.sleep(600)
+    refresh_data()
 
 def wrong_code():
     processed_data['content'] = """<h1>指令错误</h1><br/>
@@ -134,4 +163,9 @@ def get_room():
     return jsonify([dict(room) for room in rooms])
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    loop_thread = threading.Thread(target=refresh_data)
+    loop_thread.daemon = True  # 设置为守护线程，使得主线程退出时子线程也能结束
+    loop_thread.start()
+
+    # 运行 Flask 服务器
+    app.run()
