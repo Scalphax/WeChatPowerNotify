@@ -2,10 +2,14 @@ from flask import Flask,request,jsonify,render_template
 from config import token,get,admin_uid
 import requests as req
 import sqlite3 as sql
-import time,threading,traceback
+import time,threading,traceback,datetime,pytz
 
 api_url = "https://wxpusher.zjiecode.com/api/send/message"
 app = Flask(__name__)
+
+utc8 = pytz.timezone('Asia/Shanghai')
+def current_time():
+    return datetime.now(utc8).strftime('%Y.%m.%d %H:%M:%S')
 
 processed_data = {
   "appToken": token,
@@ -54,9 +58,9 @@ def refresh_data():
             }
             data = get("queryReserve",up_dict)
             conn.execute("""UPDATE usr  
-                            SET money = ?, used = ?, remain = ?, timestamp = datetime('now', '+8 hours')
+                            SET money = ?, used = ?, remain = ?, timestamp = ?
                             WHERE uid = ?
-                        """, (data['meterOverdue'],data['ZVlaue'],data['remainPower'],uid))
+                        """, (data['meterOverdue'],data['ZVlaue'],data['remainPower'],current_time(),uid))
             alarm_type,alarm_value = row[2].split(':')
             at = lambda type: data['meterOverdue'] if type == "m" else data['remainPower']
             if float(alarm_value) >= float(at(alarm_type)):
@@ -117,8 +121,8 @@ def command():
                 else:
                     conn = open_sql()
                     conn.execute("""INSERT OR REPLACE INTO usr (uid, roomid, used, remain, money, alarm, timestamp)
-                            VALUES (?, ?, ?, ?, ?, ?, datetime('now', '+8 hours'))""",
-                            (uid, roomid, user_data['ZVlaue'], user_data['remainPower'], user_data['meterOverdue'], "m:20"))
+                            VALUES (?, ?, ?, ?, ?, ?, ?)""",
+                            (uid, roomid, user_data['ZVlaue'], user_data['remainPower'], user_data['meterOverdue'], "m:20", current_time()))
                     conn.commit()
                     buildname,areaname,dorm = conn.execute('SELECT buildname, areaname, dorm FROM kv WHERE roomid = ?',(roomid,)).fetchone()
                     processed_data['summary'] = f"提醒设置成功"
@@ -152,7 +156,7 @@ def command():
                 wrong_code()
         elif cmd == "ping":
             processed_data['content'] = f"""<h1>pong</h1><br/>
-                                            <p>发送时间{time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())}</p>"""
+                                            <p>发送时间{current_time()}</p>"""
             req.post(api_url,json=processed_data,verify=False)
             return '',200
         else:
