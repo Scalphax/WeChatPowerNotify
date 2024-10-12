@@ -8,6 +8,7 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 token = "AT_Ij1vvIn0agXc1xlgRvaepYbWK92QWbyp"
 Username = "1024007793"
 Password = "sand0323"
+admin_uid = "UID_eeNJnqORstR5FRd0AWtS01MhyI9c"
 
 def get(method: str, up_dict):  # getAreaInfo, queryBuildList, queryFloorList, getRoomInfo, queryRoomElec, queryReserve
     global jsessionid
