@@ -80,7 +80,7 @@ for area in areas[areasbegin:]:
                     except ValueError:
                         print(f"W:非标准命名房间,位于{buildname},{room_part}")
                         dorm = room_part
-                    cursor.execute(f"INSERT OR REPLACE INTO kv (areaid,buildid,roomid,areaname,buildname,dorm,timestamp) VALUES ('{areaid}', '{buildid}',  '{roomid}', '{areaname}', '{buildname}', '{dorm}', CURRENT_TIMESTAMP)")
+                    cursor.execute(f"INSERT OR REPLACE INTO kv (areaid,buildid,roomid,areaname,buildname,dorm,timestamp) VALUES ('{areaid}', '{buildid}',  '{roomid}', '{areaname}', '{buildname}', '{dorm}', datetime('now', '+8 hours'))")
 
             conn.commit()
             time.sleep(0.5)

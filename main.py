@@ -17,6 +17,11 @@ processed_data = {
   "verifyPayType":0 
 }
 
+def loop():
+    refresh_data()
+    time.sleep(600)
+    loop()
+
 def open_sql():
     conn = sql.connect('elect.db')
     conn.row_factory = sql.Row
@@ -49,7 +54,7 @@ def refresh_data():
             }
             data = get("queryReserve",up_dict)
             conn.execute("""UPDATE usr  
-                            SET money = ?, used = ?, remain = ?, timestamp = CURRENT_TIMESTAMP
+                            SET money = ?, used = ?, remain = ?, timestamp = datetime('now', '+8 hours')
                             WHERE uid = ?
                         """, (data['meterOverdue'],data['ZVlaue'],data['remainPower'],uid))
             alarm_type,alarm_value = row[2].split(':')
@@ -62,8 +67,6 @@ def refresh_data():
                 req.post(api_url,json=processed_data,verify=False)
                 data_query(uid)
         conn.commit()
-        time.sleep(600)
-        refresh_data()
     except Exception:
         error_details = traceback.format_exc()
         processed_data['uids'] = [admin_uid,]
@@ -114,7 +117,7 @@ def command():
                 else:
                     conn = open_sql()
                     conn.execute("""INSERT OR REPLACE INTO usr (uid, roomid, used, remain, money, alarm, timestamp)
-                            VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)""",
+                            VALUES (?, ?, ?, ?, ?, ?, datetime('now', '+8 hours'))""",
                             (uid, roomid, user_data['ZVlaue'], user_data['remainPower'], user_data['meterOverdue'], "m:20"))
                     conn.commit()
                     buildname,areaname,dorm = conn.execute('SELECT buildname, areaname, dorm FROM kv WHERE roomid = ?',(roomid,)).fetchone()
@@ -141,6 +144,11 @@ def command():
         elif cmd == "check":
             data_query(uid)
             return '',200
+        elif cmd == "refresh":
+            if uid == admin_uid:
+                refresh_data()
+            else:
+                wrong_code()
         else:
             wrong_code()
                     
@@ -170,7 +178,7 @@ def get_room():
     return jsonify([dict(room) for room in rooms])
 
 if __name__ == '__main__':
-    loop_thread = threading.Thread(target=refresh_data)
+    loop_thread = threading.Thread(target=loop)
     loop_thread.daemon = True  # 设置为守护线程，使得主线程退出时子线程也能结束
     loop_thread.start()
 
