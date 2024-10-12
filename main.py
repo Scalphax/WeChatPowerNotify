@@ -1,15 +1,18 @@
 from flask import Flask,request,jsonify,render_template
 from config import token,get,admin_uid
+from datetime import datetime, timedelta, timezone
 import requests as req
 import sqlite3 as sql
-import time,threading,traceback,datetime,pytz
+import time,threading,traceback
 
 api_url = "https://wxpusher.zjiecode.com/api/send/message"
 app = Flask(__name__)
 
-utc8 = pytz.timezone('Asia/Shanghai')
+utc8 = timezone(timedelta(hours=8))
 def current_time():
-    return datetime.now(utc8).strftime('%Y.%m.%d %H:%M:%S')
+    current_time_utc8 = datetime.now(utc8)
+    current_time = current_time_utc8.strftime("%Y-%m-%d %H:%M:%S")
+    return current_time
 
 processed_data = {
   "appToken": token,
