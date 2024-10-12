@@ -12,7 +12,6 @@ admin_uid = "UID_eeNJnqORstR5FRd0AWtS01MhyI9c"
 
 def get(method: str, up_dict):  # getAreaInfo, queryBuildList, queryFloorList, getRoomInfo, queryRoomElec, queryReserve
     global jsessionid
-    jsessionid = ""
     try:
         cookie = f"JSESSIONID={jsessionid}"
     except:
