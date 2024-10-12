@@ -147,11 +147,13 @@ def command():
         elif cmd == "refresh":
             if uid == admin_uid:
                 refresh_data()
+                return '',200
             else:
                 wrong_code()
         elif cmd == "ping":
             processed_data['content'] = f"""<h1>pong</h1><br/>
                                             <p>发送时间{time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())}</p>"""
+            return '',200
         else:
             wrong_code()
                     
