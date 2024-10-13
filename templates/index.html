@@ -14,16 +14,28 @@
   Room ID: <span id="roomid"></span>
 </div>
 
+<div id="loading" style="display: none; margin-top: 20px;">请稍后...</div>
+
 <script>
   let dormRoomMap = {};  // 用来存储 dorm 和 roomid 的对应关系
 
+  // 显示加载提示
+  function showLoading() {
+      document.getElementById("loading").style.display = "block";
+  }
+
+  // 隐藏加载提示
+  function hideLoading() {
+      document.getElementById("loading").style.display = "none";
+  }
+
   // 加载 areaname 选择项
   fetch('http://wechat.qiulishe.com:16850/areas', {
-      method: 'POST',  // 改为 POST 请求
+      method: 'POST',
       headers: {
           'Content-Type': 'application/json'
       },
-      body: JSON.stringify({})  // POST 请求可以带上请求体，这里可以根据需要填充
+      body: JSON.stringify({})
   })
   .then(response => response.json())
   .then(data => {
@@ -31,22 +43,25 @@
       areaSelect.innerHTML = '<option value="">选择区域</option>';
       data.forEach(area => {
           const option = document.createElement("option");
-          option.value = area.areaname;  // 提交 areaname
-          option.textContent = area.areaname;  // 显示 areaname
+          option.value = area.areaname;
+          option.textContent = area.areaname;
           areaSelect.appendChild(option);
       });
-  });
+      hideLoading();  // 隐藏加载提示
+  })
+  .catch(() => hideLoading()); // 在出现错误时隐藏加载提示
 
   // 更新 buildname 选择项
   function updateBuilds() {
       const area = document.getElementById("area").value;
       if (area) {
+          showLoading();  // 显示加载提示
           fetch('http://wechat.qiulishe.com:16850/builds', {
-              method: 'POST',  // 改为 POST 请求
+              method: 'POST',
               headers: {
                   'Content-Type': 'application/json'
               },
-              body: JSON.stringify({ areaname: area })  // 发送 areaname 参数
+              body: JSON.stringify({ areaname: area })
           })
           .then(response => response.json())
           .then(data => {
@@ -54,11 +69,13 @@
               buildSelect.innerHTML = '<option value="">选择建筑</option>';
               data.forEach(build => {
                   const option = document.createElement("option");
-                  option.value = build.buildname;  // 提交 buildname
-                  option.textContent = build.buildname;  // 显示 buildname
+                  option.value = build.buildname;
+                  option.textContent = build.buildname;
                   buildSelect.appendChild(option);
               });
-          });
+              hideLoading();  // 隐藏加载提示
+          })
+          .catch(() => hideLoading()); // 在出现错误时隐藏加载提示
       }
       document.getElementById("dorm").innerHTML = '<option value="">选择房间</option>';
       document.getElementById("roomid").textContent = '';
@@ -69,26 +86,29 @@
       const area = document.getElementById("area").value;
       const build = document.getElementById("build").value;
       if (area && build) {
+          showLoading();  // 显示加载提示
           fetch('http://wechat.qiulishe.com:16850/rooms', {
-              method: 'POST',  // 改为 POST 请求
+              method: 'POST',
               headers: {
                   'Content-Type': 'application/json'
               },
-              body: JSON.stringify({ areaname: area, buildname: build })  // 发送 areaname 和 buildname 参数
+              body: JSON.stringify({ areaname: area, buildname: build })
           })
           .then(response => response.json())
           .then(data => {
               const dormSelect = document.getElementById("dorm");
               dormSelect.innerHTML = '<option value="">选择房间</option>';
-              dormRoomMap = {};  // 清空上次的数据
+              dormRoomMap = {};
               data.forEach(item => {
                   const option = document.createElement("option");
-                  option.value = item.dorm;  // 提交 dorm
-                  option.textContent = item.dorm;  // 显示 dorm
-                  dormRoomMap[item.dorm] = item.roomid;  // 记录 dorm 和 roomid 的对应关系
+                  option.value = item.dorm;
+                  option.textContent = item.dorm;
+                  dormRoomMap[item.dorm] = item.roomid;
                   dormSelect.appendChild(option);
               });
-          });
+              hideLoading();  // 隐藏加载提示
+          })
+          .catch(() => hideLoading()); // 在出现错误时隐藏加载提示
       }
       document.getElementById("roomid").textContent = '';
   }
@@ -96,7 +116,10 @@
   // 根据用户选择的 dorm 显示对应的 roomid
   function displayRoom() {
       const dorm = document.getElementById("dorm").value;
-      const roomid = dormRoomMap[dorm];  // 直接从 dormRoomMap 中获取对应的 roomid
+      const roomid = dormRoomMap[dorm];
       document.getElementById("roomid").textContent = roomid || 'Not found';
   }
+
+  // 初始加载时显示加载提示
+  showLoading();
 </script>
