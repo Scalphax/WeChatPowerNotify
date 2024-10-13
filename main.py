@@ -90,13 +90,6 @@ def wrong_code():
     req.post(api_url,json=processed_data,verify=False)
     return '',400
 
-@app.after_request
-def after_request(response):
-    response.headers.add('Access-Control-Allow-Origin', '*')
-    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
-    response.headers.add('Access-Control-Allow-Methods', 'GET,POST,OPTIONS')
-    return response
-
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -174,26 +167,28 @@ def command():
         else:
             wrong_code()
                     
-@app.route('/areas', methods=['GET'])
+@app.route('/areas', methods=['POST'])
 def get_areas():
     conn = open_sql()
     areas = conn.execute('SELECT DISTINCT areaname FROM kv').fetchall()
     conn.close()
     return jsonify([dict(area) for area in areas])
 
-@app.route("/builds",methods=['GET'])
+@app.route("/builds", methods=['POST'])
 def get_build():
     conn = open_sql()
-    areaname = request.args.get('areaname')
-    buildname_all = conn.execute('SELECT DISTINCT buildname from kv WHERE areaname = ?',(areaname,)).fetchall()
+    data = request.get_json()
+    areaname = data.get('areaname')
+    buildname_all = conn.execute('SELECT DISTINCT buildname from kv WHERE areaname = ?', (areaname,)).fetchall()
     conn.close()
     return jsonify([dict(build) for build in buildname_all])
 
-@app.route('/rooms',methods=['GET'])
+@app.route('/rooms', methods=['POST'])
 def get_room():
     conn = open_sql()
-    areaname = request.args.get('areaname')
-    buildname = request.args.get('buildname')
+    data = request.get_json()
+    areaname = data.get('areaname')
+    buildname = data.get('buildname')
     rooms = conn.execute('SELECT roomid, dorm FROM kv WHERE areaname = ? AND buildname = ?', 
                          (areaname, buildname,)).fetchall()
     conn.close()

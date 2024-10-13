@@ -1,85 +1,102 @@
-<select id="area" onchange="updateBuilds()" style="width: 20%; height: 30px; margin: 20px;" >
-    <option value="">选择区域</option>
-  </select>
-  
-  <select id="build" onchange="updateDorms()" style="width: 20%; height: 30px; margin: 20px;">
-    <option value="">选择建筑</option>
-  </select>
-  
-  <select id="dorm" onchange="displayRoom()" style="width: 20%; height: 30px; margin: 20px;">
-    <option value="">选择房间</option>
-  </select>
-  
-  <div id="room">
-    Room ID: <span id="roomid"></span>
-  </div>
-  
-  <script>
-    let dormRoomMap = {};  // 用来存储 dorm 和 roomid 的对应关系
-  
-    // 加载 areaname 选择项
-    fetch('http://wechat.qiulishe.com:16850/areas')
-      .then(response => response.json())
-      .then(data => {
-        const areaSelect = document.getElementById("area");
-        areaSelect.innerHTML = '<option value="">选择区域</option>';
-        data.forEach(area => {
+<select id="area" onchange="updateBuilds()" style="width: 20%; height: 30px; margin: 20px;">
+  <option value="">选择区域</option>
+</select>
+
+<select id="build" onchange="updateDorms()" style="width: 20%; height: 30px; margin: 20px;">
+  <option value="">选择建筑</option>
+</select>
+
+<select id="dorm" onchange="displayRoom()" style="width: 20%; height: 30px; margin: 20px;">
+  <option value="">选择房间</option>
+</select>
+
+<div id="room">
+  Room ID: <span id="roomid"></span>
+</div>
+
+<script>
+  let dormRoomMap = {};  // 用来存储 dorm 和 roomid 的对应关系
+
+  // 加载 areaname 选择项
+  fetch('http://wechat.qiulishe.com:16850/areas', {
+      method: 'POST',  // 改为 POST 请求
+      headers: {
+          'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({})  // POST 请求可以带上请求体，这里可以根据需要填充
+  })
+  .then(response => response.json())
+  .then(data => {
+      const areaSelect = document.getElementById("area");
+      areaSelect.innerHTML = '<option value="">选择区域</option>';
+      data.forEach(area => {
           const option = document.createElement("option");
           option.value = area.areaname;  // 提交 areaname
           option.textContent = area.areaname;  // 显示 areaname
           areaSelect.appendChild(option);
-        });
       });
-  
-    // 更新 buildname 选择项
-    function updateBuilds() {
+  });
+
+  // 更新 buildname 选择项
+  function updateBuilds() {
       const area = document.getElementById("area").value;
       if (area) {
-        fetch(`http://wechat.qiulishe.com:16850/builds?areaname=${area}`)
+          fetch('http://wechat.qiulishe.com:16850/builds', {
+              method: 'POST',  // 改为 POST 请求
+              headers: {
+                  'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ areaname: area })  // 发送 areaname 参数
+          })
           .then(response => response.json())
           .then(data => {
-            const buildSelect = document.getElementById("build");
-            buildSelect.innerHTML = '<option value="">选择建筑</option>';
-            data.forEach(build => {
-              const option = document.createElement("option");
-              option.value = build.buildname;  // 提交 buildname
-              option.textContent = build.buildname;  // 显示 buildname
-              buildSelect.appendChild(option);
-            });
+              const buildSelect = document.getElementById("build");
+              buildSelect.innerHTML = '<option value="">选择建筑</option>';
+              data.forEach(build => {
+                  const option = document.createElement("option");
+                  option.value = build.buildname;  // 提交 buildname
+                  option.textContent = build.buildname;  // 显示 buildname
+                  buildSelect.appendChild(option);
+              });
           });
       }
       document.getElementById("dorm").innerHTML = '<option value="">选择房间</option>';
       document.getElementById("roomid").textContent = '';
-    }
-  
-    // 更新 dorm 和 roomid 选择项
-    function updateDorms() {
+  }
+
+  // 更新 dorm 和 roomid 选择项
+  function updateDorms() {
       const area = document.getElementById("area").value;
       const build = document.getElementById("build").value;
       if (area && build) {
-        fetch(`http://wechat.qiulishe.com:16850/rooms?areaname=${area}&buildname=${build}`)
+          fetch('http://wechat.qiulishe.com:16850/rooms', {
+              method: 'POST',  // 改为 POST 请求
+              headers: {
+                  'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ areaname: area, buildname: build })  // 发送 areaname 和 buildname 参数
+          })
           .then(response => response.json())
           .then(data => {
-            const dormSelect = document.getElementById("dorm");
-            dormSelect.innerHTML = '<option value="">选择房间</option>';
-            dormRoomMap = {};  // 清空上次的数据
-            data.forEach(item => {
-              const option = document.createElement("option");
-              option.value = item.dorm;  // 提交 dorm
-              option.textContent = item.dorm;  // 显示 dorm
-              dormRoomMap[item.dorm] = item.roomid;  // 记录 dorm 和 roomid 的对应关系
-              dormSelect.appendChild(option);
-            });
+              const dormSelect = document.getElementById("dorm");
+              dormSelect.innerHTML = '<option value="">选择房间</option>';
+              dormRoomMap = {};  // 清空上次的数据
+              data.forEach(item => {
+                  const option = document.createElement("option");
+                  option.value = item.dorm;  // 提交 dorm
+                  option.textContent = item.dorm;  // 显示 dorm
+                  dormRoomMap[item.dorm] = item.roomid;  // 记录 dorm 和 roomid 的对应关系
+                  dormSelect.appendChild(option);
+              });
           });
       }
       document.getElementById("roomid").textContent = '';
-    }
-  
-    // 根据用户选择的 dorm 显示对应的 roomid
-    function displayRoom() {
+  }
+
+  // 根据用户选择的 dorm 显示对应的 roomid
+  function displayRoom() {
       const dorm = document.getElementById("dorm").value;
       const roomid = dormRoomMap[dorm];  // 直接从 dormRoomMap 中获取对应的 roomid
       document.getElementById("roomid").textContent = roomid || 'Not found';
-    }
-  </script>
-  
+  }
+</script>
