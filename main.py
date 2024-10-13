@@ -1,5 +1,6 @@
 from flask import Flask,request,jsonify,render_template
 from config import token,get,admin_uid
+from flask_cors import CORS
 from datetime import datetime, timedelta, timezone
 import requests as req
 import sqlite3 as sql
@@ -7,6 +8,7 @@ import time,threading,traceback
 
 api_url = "https://wxpusher.zjiecode.com/api/send/message"
 app = Flask(__name__)
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 utc8 = timezone(timedelta(hours=8))
 def current_time():

@@ -18,7 +18,7 @@
     let dormRoomMap = {};  // 用来存储 dorm 和 roomid 的对应关系
   
     // 加载 areaname 选择项
-    fetch('/areas')
+    fetch('http://wechat.qiulishe.com:16850/areas')
       .then(response => response.json())
       .then(data => {
         const areaSelect = document.getElementById("area");
@@ -35,7 +35,7 @@
     function updateBuilds() {
       const area = document.getElementById("area").value;
       if (area) {
-        fetch(`/builds?areaname=${area}`)
+        fetch(`http://wechat.qiulishe.com:16850/builds?areaname=${area}`)
           .then(response => response.json())
           .then(data => {
             const buildSelect = document.getElementById("build");
@@ -57,7 +57,7 @@
       const area = document.getElementById("area").value;
       const build = document.getElementById("build").value;
       if (area && build) {
-        fetch(`/rooms?areaname=${area}&buildname=${build}`)
+        fetch(`http://wechat.qiulishe.com:16850/rooms?areaname=${area}&buildname=${build}`)
           .then(response => response.json())
           .then(data => {
             const dormSelect = document.getElementById("dorm");
