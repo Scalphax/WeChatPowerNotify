@@ -1,125 +1,126 @@
 <select id="area" onchange="updateBuilds()" style="width: 20%; height: 30px; margin: 20px;">
-  <option value="">选择区域</option>
-</select>
-
-<select id="build" onchange="updateDorms()" style="width: 20%; height: 30px; margin: 20px;">
-  <option value="">选择建筑</option>
-</select>
-
-<select id="dorm" onchange="displayRoom()" style="width: 20%; height: 30px; margin: 20px;">
-  <option value="">选择房间</option>
-</select>
-
-<div id="room">
-  Room ID: <span id="roomid"></span>
-</div>
-
-<div id="loading" style="display: none; margin-top: 20px;">请稍后...</div>
-
-<script>
-  let dormRoomMap = {};  // 用来存储 dorm 和 roomid 的对应关系
-
-  // 显示加载提示
-  function showLoading() {
-      document.getElementById("loading").style.display = "block";
-  }
-
-  // 隐藏加载提示
-  function hideLoading() {
-      document.getElementById("loading").style.display = "none";
-  }
-
-  // 加载 areaname 选择项
-  fetch('http://wechat.qiulishe.com:16850/areas', {
-      method: 'POST',
-      headers: {
-          'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({})
-  })
-  .then(response => response.json())
-  .then(data => {
-      const areaSelect = document.getElementById("area");
-      areaSelect.innerHTML = '<option value="">选择区域</option>';
-      data.forEach(area => {
-          const option = document.createElement("option");
-          option.value = area.areaname;
-          option.textContent = area.areaname;
-          areaSelect.appendChild(option);
-      });
-      hideLoading();  // 隐藏加载提示
-  })
-  .catch(() => hideLoading()); // 在出现错误时隐藏加载提示
-
-  // 更新 buildname 选择项
-  function updateBuilds() {
-      const area = document.getElementById("area").value;
-      if (area) {
-          showLoading();  // 显示加载提示
-          fetch('http://wechat.qiulishe.com:16850/builds', {
-              method: 'POST',
-              headers: {
-                  'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({ areaname: area })
-          })
-          .then(response => response.json())
-          .then(data => {
-              const buildSelect = document.getElementById("build");
-              buildSelect.innerHTML = '<option value="">选择建筑</option>';
-              data.forEach(build => {
-                  const option = document.createElement("option");
-                  option.value = build.buildname;
-                  option.textContent = build.buildname;
-                  buildSelect.appendChild(option);
-              });
-              hideLoading();  // 隐藏加载提示
-          })
-          .catch(() => hideLoading()); // 在出现错误时隐藏加载提示
-      }
-      document.getElementById("dorm").innerHTML = '<option value="">选择房间</option>';
-      document.getElementById("roomid").textContent = '';
-  }
-
-  // 更新 dorm 和 roomid 选择项
-  function updateDorms() {
-      const area = document.getElementById("area").value;
-      const build = document.getElementById("build").value;
-      if (area && build) {
-          showLoading();  // 显示加载提示
-          fetch('http://wechat.qiulishe.com:16850/rooms', {
-              method: 'POST',
-              headers: {
-                  'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({ areaname: area, buildname: build })
-          })
-          .then(response => response.json())
-          .then(data => {
-              const dormSelect = document.getElementById("dorm");
-              dormSelect.innerHTML = '<option value="">选择房间</option>';
-              dormRoomMap = {};
-              data.forEach(item => {
-                  const option = document.createElement("option");
-                  option.value = item.dorm;
-                  option.textContent = item.dorm;
-                  dormRoomMap[item.dorm] = item.roomid;
-                  dormSelect.appendChild(option);
-              });
-              hideLoading();  // 隐藏加载提示
-          })
-          .catch(() => hideLoading()); // 在出现错误时隐藏加载提示
-      }
-      document.getElementById("roomid").textContent = '';
-  }
-
-  // 根据用户选择的 dorm 显示对应的 roomid
-  function displayRoom() {
-      const dorm = document.getElementById("dorm").value;
-      const roomid = dormRoomMap[dorm];
-      document.getElementById("roomid").textContent = roomid || 'Not found';
-  }
-
-  // 初始加载时显示加载提示
-  showLoading();
-</script>
+    <option value="">选择区域</option>
+  </select>
+  
+  <select id="build" onchange="updateDorms()" style="width: 20%; height: 30px; margin: 20px;">
+    <option value="">选择建筑</option>
+  </select>
+  
+  <select id="dorm" onchange="displayRoom()" style="width: 20%; height: 30px; margin: 20px;">
+    <option value="">选择房间</option>
+  </select>
+  
+  <div id="room">
+    Room ID: <span id="roomid"></span>
+  </div>
+  
+  <div id="loading" style="display: none; margin-top: 20px;">请稍后...</div>
+  
+  <script>
+    let dormRoomMap = {};  // 用来存储 dorm 和 roomid 的对应关系
+  
+    // 显示加载提示
+    function showLoading() {
+        document.getElementById("loading").style.display = "block";
+    }
+  
+    // 隐藏加载提示
+    function hideLoading() {
+        document.getElementById("loading").style.display = "none";
+    }
+  
+    // 加载 areaname 选择项
+    fetch('/areas', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({})
+    })
+    .then(response => response.json())
+    .then(data => {
+        const areaSelect = document.getElementById("area");
+        areaSelect.innerHTML = '<option value="">选择区域</option>';
+        data.forEach(area => {
+            const option = document.createElement("option");
+            option.value = area.areaname;
+            option.textContent = area.areaname;
+            areaSelect.appendChild(option);
+        });
+        hideLoading();  // 隐藏加载提示
+    })
+    .catch(() => hideLoading()); // 在出现错误时隐藏加载提示
+  
+    // 更新 buildname 选择项
+    function updateBuilds() {
+        const area = document.getElementById("area").value;
+        if (area) {
+            showLoading();  // 显示加载提示
+            fetch('/builds', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ areaname: area })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const buildSelect = document.getElementById("build");
+                buildSelect.innerHTML = '<option value="">选择建筑</option>';
+                data.forEach(build => {
+                    const option = document.createElement("option");
+                    option.value = build.buildname;
+                    option.textContent = build.buildname;
+                    buildSelect.appendChild(option);
+                });
+                hideLoading();  // 隐藏加载提示
+            })
+            .catch(() => hideLoading()); // 在出现错误时隐藏加载提示
+        }
+        document.getElementById("dorm").innerHTML = '<option value="">选择房间</option>';
+        document.getElementById("roomid").textContent = '';
+    }
+  
+    // 更新 dorm 和 roomid 选择项
+    function updateDorms() {
+        const area = document.getElementById("area").value;
+        const build = document.getElementById("build").value;
+        if (area && build) {
+            showLoading();  // 显示加载提示
+            fetch('/rooms', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ areaname: area, buildname: build })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const dormSelect = document.getElementById("dorm");
+                dormSelect.innerHTML = '<option value="">选择房间</option>';
+                dormRoomMap = {};
+                data.forEach(item => {
+                    const option = document.createElement("option");
+                    option.value = item.dorm;
+                    option.textContent = item.dorm;
+                    dormRoomMap[item.dorm] = item.roomid;
+                    dormSelect.appendChild(option);
+                });
+                hideLoading();  // 隐藏加载提示
+            })
+            .catch(() => hideLoading()); // 在出现错误时隐藏加载提示
+        }
+        document.getElementById("roomid").textContent = '';
+    }
+  
+    // 根据用户选择的 dorm 显示对应的 roomid
+    function displayRoom() {
+        const dorm = document.getElementById("dorm").value;
+        const roomid = dormRoomMap[dorm];
+        document.getElementById("roomid").textContent = roomid || 'Not found';
+    }
+  
+    // 初始加载时显示加载提示
+    showLoading();
+  </script>
+  
