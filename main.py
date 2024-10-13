@@ -8,7 +8,7 @@ import time,threading,traceback
 
 api_url = "https://wxpusher.zjiecode.com/api/send/message"
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*"}})
+CORS(app)
 
 utc8 = timezone(timedelta(hours=8))
 def current_time():
