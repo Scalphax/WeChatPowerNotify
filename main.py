@@ -198,4 +198,4 @@ if __name__ == '__main__':
     loop_thread.start()
 
     # 运行 Flask 服务器
-    app.run()
+    app.run(host='0.0.0.0', port=16850)
