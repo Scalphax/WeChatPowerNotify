@@ -90,6 +90,13 @@ def wrong_code():
     req.post(api_url,json=processed_data,verify=False)
     return '',400
 
+@app.before_first_request
+def start_background_thread():
+    # 启动后台线程
+    thread = threading.Thread(target=loop)
+    thread.daemon = True
+    thread.start()
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -195,9 +202,4 @@ def get_room():
     return jsonify([dict(room) for room in rooms])
 
 if __name__ == '__main__':
-    loop_thread = threading.Thread(target=loop)
-    loop_thread.daemon = True  # 设置为守护线程，使得主线程退出时子线程也能结束
-    loop_thread.start()
-
-    # 运行 Flask 服务器
     app.run(host='0.0.0.0', port=16850)
