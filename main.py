@@ -90,13 +90,13 @@ def wrong_code():
     req.post(api_url,json=processed_data,verify=False)
     return '',400
 
-def start_background_thread(sender):
+def start_background_thread():
     # 启动后台线程
     thread = threading.Thread(target=loop)
     thread.daemon = True
     thread.start()
 
-app.before_request(start_background_thread)
+# app.before_request(start_background_thread)
 
 @app.route('/')
 def index():
@@ -203,4 +203,5 @@ def get_room():
     return jsonify([dict(room) for room in rooms])
 
 if __name__ == '__main__':
+    start_background_thread()
     app.run(host='0.0.0.0', port=16850)
