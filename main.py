@@ -16,6 +16,12 @@ def current_time():
     current_time = current_time_utc8.strftime("%Y-%m-%d %H:%M:%S")
     return current_time
 
+def start_background_task():
+    # 在新线程中启动后台任务
+    thread = threading.Thread(target=loop)
+    thread.daemon = True  # 设置为守护线程，主线程退出时自动停止
+    thread.start()
+
 processed_data = {
   "appToken": token,
   "content": "",
@@ -195,4 +201,5 @@ def get_room():
     conn.close()
     return jsonify([dict(room) for room in rooms])
 
-loop()
+start_background_task()
+app.run()
