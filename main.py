@@ -96,7 +96,7 @@ def start_background_thread(sender):
     thread.daemon = True
     thread.start()
 
-app.on_first_request(start_background_thread)
+app.before_request(start_background_thread)
 
 @app.route('/')
 def index():
