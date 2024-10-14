@@ -90,14 +90,6 @@ def wrong_code():
     req.post(api_url,json=processed_data,verify=False)
     return '',400
 
-def start_background_thread():
-    # 启动后台线程
-    thread = threading.Thread(target=loop)
-    thread.daemon = True
-    thread.start()
-
-# app.before_request(start_background_thread)
-
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -131,6 +123,7 @@ def command():
                     processed_data['content'] = """<h1>roomid不存在</h1><br/>
                                     <p>请检查您的输入格式与roomid</p>"""
                     req.post(api_url,json=processed_data,verify=False)
+                    return '',400
                 else:
                     conn = open_sql()
                     conn.execute("""INSERT OR REPLACE INTO usr (uid, roomid, used, remain, money, alarm, timestamp)
@@ -202,6 +195,4 @@ def get_room():
     conn.close()
     return jsonify([dict(room) for room in rooms])
 
-if __name__ == '__main__':
-    start_background_thread()
-    app.run(host='0.0.0.0', port=16850)
+loop()
