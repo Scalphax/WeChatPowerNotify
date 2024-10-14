@@ -16,13 +16,6 @@ def current_time():
     current_time = current_time_utc8.strftime("%Y-%m-%d %H:%M:%S")
     return current_time
 
-thread = None
-def start_background_task():
-    if thread is None or not thread.is_alive():
-        thread = threading.Thread(target=loop)
-        thread.daemon = True  # 设置为守护线程，主线程退出时自动停止
-        thread.start()
-
 processed_data = {
   "appToken": token,
   "content": "",
@@ -32,11 +25,6 @@ processed_data = {
   ], 
   "verifyPayType":0 
 }
-
-def loop():
-    while True:
-        refresh_data()
-        time.sleep(600)
 
 def open_sql():
     conn = sql.connect('elect.db')
@@ -201,6 +189,3 @@ def get_room():
                          (areaname, buildname,)).fetchall()
     conn.close()
     return jsonify([dict(room) for room in rooms])
-
-start_background_task()
-app.run()
