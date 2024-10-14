@@ -90,12 +90,13 @@ def wrong_code():
     req.post(api_url,json=processed_data,verify=False)
     return '',400
 
-@app.before_first_request
-def start_background_thread():
+def start_background_thread(sender):
     # 启动后台线程
     thread = threading.Thread(target=loop)
     thread.daemon = True
     thread.start()
+
+app.on_first_request(start_background_thread)
 
 @app.route('/')
 def index():
