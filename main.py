@@ -27,9 +27,9 @@ processed_data = {
 }
 
 def loop():
-    refresh_data()
-    time.sleep(600)
-    loop()
+    while True:
+        refresh_data()
+        time.sleep(600)
 
 def open_sql():
     conn = sql.connect('elect.db')
