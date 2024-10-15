@@ -7,8 +7,8 @@ from main import refresh_data
 def loop():
     while True:
         now = datetime.datetime.now().time()
-        start_time = time(23, 0)   # 23:00
-        end_time = time(0, 30)     # 00:30
+        start_time = time.time(23, 0)   # 23:00
+        end_time = time.time(0, 30)     # 00:30
 
         if not start_time <= now or not now <= end_time:
             refresh_data()
