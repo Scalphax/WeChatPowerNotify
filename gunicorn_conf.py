@@ -1,11 +1,12 @@
 # gunicorn_conf.py
-import threading,time,datetime
+import threading,time
+import datetime
 from main import refresh_data
 
 
 def loop():
     while True:
-        now = datetime.now().time()
+        now = datetime.datetime.now().time()
         start_time = time(23, 0)   # 23:00
         end_time = time(0, 30)     # 00:30
 
