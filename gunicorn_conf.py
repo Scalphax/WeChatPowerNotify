@@ -6,11 +6,12 @@ from main import refresh_data
 
 def loop():
     while True:
-        now = datetime.datetime.now().time()
-        start_time = time.time(23, 0)   # 23:00
-        end_time = time.time(0, 30)     # 00:30
+        start_time = datetime.datetime.strptime(str(datetime.datetime.now().date()) + '0:30', '%Y-%m-%d%H:%M')
+        end_time = datetime.datetime.strptime(str(datetime.datetime.now().date()) + '23:00', '%Y-%m-%d%H:%M')
 
-        if not start_time <= now or not now <= end_time:
+        now_time = datetime.datetime.now()
+
+        if start_time < now_time < end_time:
             refresh_data()
             time.sleep(600)
 
