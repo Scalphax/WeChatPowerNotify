@@ -1,13 +1,17 @@
 # gunicorn_conf.py
-import threading
-import time
+import threading,time,datetime
 from main import refresh_data
 
 
 def loop():
     while True:
-        refresh_data()
-        time.sleep(600)
+        now = datetime.now().time()
+        start_time = time(23, 0)   # 23:00
+        end_time = time(0, 30)     # 00:30
+
+        if not start_time <= now or not now <= end_time:
+            refresh_data()
+            time.sleep(600)
 
 def start_background_task():
     background_thread = threading.Thread(target=loop, name="BackgroundTask")

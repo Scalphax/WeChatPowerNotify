@@ -4,7 +4,7 @@ from flask_cors import CORS
 from datetime import datetime, timedelta, timezone
 import requests as req
 import sqlite3 as sql
-import time,threading,traceback
+import traceback
 
 api_url = "https://wxpusher.zjiecode.com/api/send/message"
 app = Flask(__name__)
